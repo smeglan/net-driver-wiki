@@ -16,8 +16,12 @@ router.post("/", async (req: any, res: any) => {
 
 // 🔵 Obtener todos los Digimon
 router.get("/", async (_req: any, res: any) => {
-  const digimons = await DigimonModel.find();
-  res.json(digimons);
+  try {
+    const digimons = await DigimonModel.find();
+    res.json(digimons);
+  } catch (error) {
+    res.status(500).json({ error: "Error to get Digimons" });
+  }
 });
 
 // 🟡 Obtener un Digimon por ID

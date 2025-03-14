@@ -4,9 +4,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 //routes
-import digimon from "./api/digimon";
-import item from "./api/item";
-import quest from "./api/quest";
+import digimon from "./src/api/digimon";
+import item from "./src/api/item";
+import quest from "./src/api/quest";
 
 dotenv.config();
 
