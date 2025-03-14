@@ -1,0 +1,26 @@
+# 📂 Node.js
+node_modules/
+dist/
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ⚙️ TypeScript
+*.tsbuildinfo
+
+# 🔥 Logs
+logs
+*.log
+logs/*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 🚀 Editor y sistema
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
