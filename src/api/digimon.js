@@ -4,7 +4,7 @@ import { DigimonModel } from "../models/digimon.model";
 const router = Router();
 
 // 🟢 Create a Digimon
-router.post("/", async (req: any, res: any) => {
+router.post("/", async (req, res) => {
   try {
     const newDigimon = new DigimonModel(req.body);
     await newDigimon.save();
@@ -15,7 +15,7 @@ router.post("/", async (req: any, res: any) => {
 });
 
 // 🔵 Obtener todos los Digimon
-router.get("/", async (_req: any, res: any) => {
+router.get("/", async (_req, res) => {
   try {
     const digimons = await DigimonModel.find();
     res.json(digimons);
@@ -25,7 +25,7 @@ router.get("/", async (_req: any, res: any) => {
 });
 
 // 🟡 Obtener un Digimon por ID
-router.get("/:name", async (req: any, res: any) => {
+router.get("/:name", async (req, res) => {
   try {
     const digimon = await DigimonModel.findOne({name:req.params.name});
     if (!digimon) return res.status(404).json({ error: "Not found" });
@@ -36,7 +36,7 @@ router.get("/:name", async (req: any, res: any) => {
 });
 
 // 🟠 Actualizar un Digimon
-router.put("/:id", async (req: any, res:any) => {
+router.put("/:id", async (req, res) => {
   try {
     const updatedDigimon = await DigimonModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedDigimon) return res.status(404).json({ error: "No encontrado" });
@@ -47,7 +47,7 @@ router.put("/:id", async (req: any, res:any) => {
 });
 
 // 🔴 Eliminar un Digimon
-router.delete("/:id", async (req: any, res: any) => {
+router.delete("/:id", async (req, res) => {
   try {
     await DigimonModel.findByIdAndDelete(req.params.id);
     res.json({ message: "Digimon eliminado" });

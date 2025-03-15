@@ -4,7 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 //routes
-import digimon from "./src/api/digimon";
+//import digimon from "./src/api/digimon";
 import item from "./src/api/item";
 import quest from "./src/api/quest";
 
@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use("/digimon", digimon);
+//app.use("/digimon", digimon);
 app.use("/item", item);
 app.use("/quest", quest);
 
