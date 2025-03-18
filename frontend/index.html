@@ -12,7 +12,7 @@
 
     <script>
         async function cargarAPI() {
-            const res = await fetch("/api");
+            const res = await fetch("/api/");
             const data = await res.json();
             document.getElementById("respuesta").innerText = data.message;
         }
