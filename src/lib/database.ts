@@ -1,41 +1,40 @@
-import mongoose, { Connection } from "mongoose";
+import mongoose from "mongoose";
 
+const MONGODB_URI = process.env.MONGODB_URI as string;
+
+if (!MONGODB_URI) {
+  throw new Error("MONGO_URI is not defined in environment variables.");
+}
+
+// Definir una interfaz para la caché de la conexión
 interface MongooseCache {
-  conn: Connection | null;
-  promise: Promise<Connection> | null;
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
 
-const globalWithMongoose = global as typeof globalThis & { mongoose?: MongooseCache };
-const cached: MongooseCache = globalWithMongoose.mongoose || { conn: null, promise: null };
-
-if (!globalWithMongoose.mongoose) {
-  globalWithMongoose.mongoose = cached;
+// Usar una variable global tipada en TypeScript
+declare global {
+  var mongooseCache: MongooseCache | undefined;
 }
 
-export async function connectDB(): Promise<Connection> {
+// Inicializar la caché si no existe
+const cached: MongooseCache = global.mongooseCache ?? { conn: null, promise: null };
+
+export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) {
-    console.log("✅ Usando conexión existente a MongoDB");
     return cached.conn;
   }
 
-  if (!process.env.MONGODB_URI) {
-    throw new Error("⚠️ La variable de entorno MONGODB_URI no está definida");
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      bufferCommands: false,
+    });
   }
 
-  try {
-    console.log("🔄 Conectando a MongoDB...");
-    cached.promise =
-      cached.promise ||
-      mongoose.connect(process.env.MONGODB_URI, {
-        dbName: "myDatabase", // ⚡ Opcional: nombre de la base de datos
-        bufferCommands: false,
-      }).then((mongooseInstance) => mongooseInstance.connection); // 👈 Aquí convertimos el resultado a Connection
+  cached.conn = await cached.promise;
+  console.log("🔌 Connected to MongoDB");
 
-    cached.conn = await cached.promise;
-    console.log("✅ Conectado a MongoDB");
-    return cached.conn;
-  } catch (error) {
-    console.error("❌ Error conectando a MongoDB:", error);
-    throw error;
-  }
+  global.mongooseCache = cached;
+
+  return cached.conn;
 }
