@@ -1,18 +1,17 @@
 import mongoose from "mongoose";
 
 const MONGO_URI = process.env.MONGO_URI as string;
+const MONGO_DB_NAME = process.env.MONGO_DB_NAME as string;
 
 if (!MONGO_URI) {
   throw new Error("❌ MONGO_URI is not defined in environment variables.");
 }
 
-// Definir una interfaz para la caché de la conexión
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
 }
 
-// Usar `globalThis` en lugar de `var`
 const globalCache = globalThis as unknown as { mongooseCache?: MongooseCache };
 globalCache.mongooseCache = globalCache.mongooseCache ?? { conn: null, promise: null };
 
@@ -26,6 +25,7 @@ export async function connectDB(): Promise<typeof mongoose> {
     if (!globalCache.mongooseCache!.promise) {
       console.log("🔄 Connecting to MongoDB...");
       globalCache.mongooseCache!.promise = mongoose.connect(MONGO_URI, {
+        dbName: MONGO_DB_NAME, 
         bufferCommands: false,
       });
     }
