@@ -8,6 +8,7 @@ export async function GET() {
     const digimons = await Digimon.find();
     return NextResponse.json(digimons, { status: 200 });
   } catch (error) {
+    console.log("Error to get Digimons", error);
     return NextResponse.json(
       { error: "Error to get Digimon" },
       { status: 500 }
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
     await newDigimon.save();
     return NextResponse.json(newDigimon, { status: 201 });
   } catch (error) {
+    console.log("Error to save Digimon", error);
     return NextResponse.json(
       { error: "Error to save Digimon" },
       { status: 500 }

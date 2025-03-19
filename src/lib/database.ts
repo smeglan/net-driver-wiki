@@ -1,30 +1,41 @@
-import mongoose from "mongoose";
+import mongoose, { Connection } from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-
-if (!MONGODB_URI) {
-  throw new Error("⚠️ La variable de entorno MONGODB_URI no está definida.");
+interface MongooseCache {
+  conn: Connection | null;
+  promise: Promise<Connection> | null;
 }
 
-let cached = (global as any).mongoose || { conn: null, promise: null };
+const globalWithMongoose = global as typeof globalThis & { mongoose?: MongooseCache };
+const cached: MongooseCache = globalWithMongoose.mongoose || { conn: null, promise: null };
 
-export async function connectDB() {
+if (!globalWithMongoose.mongoose) {
+  globalWithMongoose.mongoose = cached;
+}
+
+export async function connectDB(): Promise<Connection> {
+  if (cached.conn) {
+    console.log("✅ Usando conexión existente a MongoDB");
+    return cached.conn;
+  }
+
+  if (!process.env.MONGODB_URI) {
+    throw new Error("⚠️ La variable de entorno MONGODB_URI no está definida");
+  }
+
   try {
-    if (cached.conn) return cached.conn;
+    console.log("🔄 Conectando a MongoDB...");
+    cached.promise =
+      cached.promise ||
+      mongoose.connect(process.env.MONGODB_URI, {
+        dbName: "myDatabase", // ⚡ Opcional: nombre de la base de datos
+        bufferCommands: false,
+      }).then((mongooseInstance) => mongooseInstance.connection); // 👈 Aquí convertimos el resultado a Connection
 
-    if (!cached.promise) {
-      cached.promise = mongoose
-        .connect(MONGODB_URI, {
-          dbName: "net_driver_wiki",
-          bufferCommands: false,
-        })
-        .then((mongoose) => mongoose);
-    }
     cached.conn = await cached.promise;
     console.log("✅ Conectado a MongoDB");
     return cached.conn;
   } catch (error) {
-    console.error("❌ Error al conectar a MongoDB:", error);
-    throw new Error("Error al conectar a la base de datos");
+    console.error("❌ Error conectando a MongoDB:", error);
+    throw error;
   }
 }
