@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/database";
-import Digimon, { IDigimon } from "@/models/digimon.model";
+import { connectDB } from "@/shared/lib/database";
+import Digimon, { IDigimon } from "@/domains/digimon/models/digimon.model";
 
 interface IRequestContext {
   params: Promise<{name:string}> 
