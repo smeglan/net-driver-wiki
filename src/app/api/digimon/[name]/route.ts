@@ -1,30 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/shared/lib/database";
 import Digimon, { IDigimon } from "@/domains/digimon/models/digimon.model";
+import { isAuthorized } from "@/shared/services/auth-middleware";
+import { revalidateTag } from "next/cache";
 
 interface IRequestContext {
-  params: Promise<{name:string}> 
+  params: Promise<{ name: string }>;
 }
 
 export async function GET(_: NextRequest, context: IRequestContext) {
-
   try {
     await connectDB();
     const { name } = await Promise.resolve(context.params);
     const digimon = await Digimon.findOne({ name });
-
     if (!digimon) {
       return NextResponse.json({ error: "Digimon not found" }, { status: 404 });
     }
-
     return NextResponse.json(digimon, { status: 200 });
   } catch (error) {
     console.log("Error to find Digimon", error);
-    return NextResponse.json({ error: "Error to find Digimon" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error to find Digimon" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE(_: NextRequest, context: IRequestContext) {
+export async function DELETE(request: NextRequest, context: IRequestContext) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     await connectDB();
     const { name } = await Promise.resolve(context.params);
@@ -35,7 +40,7 @@ export async function DELETE(_: NextRequest, context: IRequestContext) {
     if (!deletedDigimon) {
       return NextResponse.json({ error: "Digimon not found" }, { status: 404 });
     }
-
+    revalidateTag("digimons");
     return NextResponse.json({ message: "Digimon deleted" }, { status: 200 });
   } catch (error) {
     console.log("Error to delete Digimon", error);
@@ -47,6 +52,9 @@ export async function DELETE(_: NextRequest, context: IRequestContext) {
 }
 
 export async function PUT(request: NextRequest, context: IRequestContext) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     await connectDB();
     const { name } = await Promise.resolve(context.params);
@@ -58,12 +66,9 @@ export async function PUT(request: NextRequest, context: IRequestContext) {
     );
 
     if (!updatedDigimon) {
-      return NextResponse.json(
-        { error: "Digimon not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Digimon not found" }, { status: 404 });
     }
-
+    revalidateTag(name);
     return NextResponse.json(updatedDigimon, { status: 200 });
   } catch (error) {
     console.log("Error to update Digimon", error);
@@ -75,6 +80,9 @@ export async function PUT(request: NextRequest, context: IRequestContext) {
 }
 
 export async function PATCH(request: NextRequest, context: IRequestContext) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     await connectDB();
     const { name } = await Promise.resolve(context.params);
@@ -86,12 +94,9 @@ export async function PATCH(request: NextRequest, context: IRequestContext) {
     );
 
     if (!updatedDigimon) {
-      return NextResponse.json(
-        { error: "Digimon not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Digimon not found" }, { status: 404 });
     }
-
+    revalidateTag(name);
     return NextResponse.json(updatedDigimon, { status: 200 });
   } catch (error) {
     console.log("Error to update Digimons", error);
