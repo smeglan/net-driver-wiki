@@ -1,5 +1,5 @@
 import { DigimonAttribute, DigimonStage } from "@/shared/types/digimon";
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IDigimon extends Document {
   name: string;
@@ -8,11 +8,13 @@ export interface IDigimon extends Document {
   attribute: DigimonAttribute;
   image?: string;
   stats?: {
-    hp: number,
+    hp: number;
     attack: number;
     defense: number;
     speed: number;
+    baseWeight: number;
   };
+  digitama?: Types.ObjectId[];
 }
 
 const DigimonSchema = new Schema<IDigimon>({
@@ -26,7 +28,9 @@ const DigimonSchema = new Schema<IDigimon>({
     attack: { type: Number, default: 0 },
     defense: { type: Number, default: 0 },
     speed: { type: Number, default: 0 },
+    baseWeight:{ type: Number, default: 0 },
   },
+  digitama: [{ type: Schema.Types.ObjectId, ref: "Digitama" }],
 });
 
 export default mongoose.models.Digimon || mongoose.model<IDigimon>("Digimon", DigimonSchema);

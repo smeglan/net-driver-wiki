@@ -5,13 +5,15 @@ import { ArrowRightIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import ResultWithIcon from "./result-with-icon";
 import ImageStore from "@/shared/lib/image-store";
 import { IDigimon } from "@/domains/digimon/models/digimon.model";
+import { useRouter } from "next/navigation";
 
-interface ISearchBarProps{
-  digimons: IDigimon[]|never[]
+interface ISearchBarProps {
+  digimons: IDigimon[] | never[];
 }
 
 export default function SearchBar(props: ISearchBarProps) {
   const { digimons } = props;
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState<{ name: string }[]>(
     []
@@ -35,7 +37,9 @@ export default function SearchBar(props: ISearchBarProps) {
     setQuery(name);
     setFilteredResults([]);
   };
-
+  const search = () => {
+    router.push(`/digimon/${query}`);
+  };
   return (
     <div className="relative w-72">
       <input
@@ -57,7 +61,10 @@ export default function SearchBar(props: ISearchBarProps) {
           <XMarkIcon className="w-5 h-5 text-green-500 font-bold hover:text-white" />
         </button>
       )}
-      <button className="absolute inset-y-0 right-3 flex items-center">
+      <button
+        className="absolute inset-y-0 right-3 flex items-center"
+        onClick={search}
+      >
         <ArrowRightIcon className="w-7 h-7 text-green-500 font-bold hover:text-green-400" />
       </button>
       {filteredResults.length > 0 && (

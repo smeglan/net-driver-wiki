@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/shared/lib/database";
-import Digimon, { IDigimon } from "@/domains/digimon/models/digimon.model";
+import Digitama, { IDigitama } from "@/domains/digitama/models/digitama.model";
 import { isAuthorized } from "@/shared/services/auth-middleware";
 import { revalidateTag } from "next/cache";
-import "@/domains/digitama/models/digitama.model"; 
 
 interface IRequestContext {
   params: Promise<{ name: string }>;
@@ -13,15 +12,15 @@ export async function GET(_: NextRequest, context: IRequestContext) {
   try {
     await connectDB();
     const { name } = await Promise.resolve(context.params);
-    const digimon = await Digimon.findOne({ name }).populate("digitama");
-    if (!digimon) {
-      return NextResponse.json({ error: "Digimon not found" }, { status: 404 });
+    const digitama = await Digitama.findOne({ name }).populate("digitamas");
+    if (!digitama) {
+      return NextResponse.json({ error: "Digitama not found" }, { status: 404 });
     }
-    return NextResponse.json(digimon, { status: 200 });
+    return NextResponse.json(digitama, { status: 200 });
   } catch (error) {
-    console.log("Error to find Digimon", error);
+    console.log("Error to find Digitama", error);
     return NextResponse.json(
-      { error: "Error to find Digimon" },
+      { error: "Error to find Digitama" },
       { status: 500 }
     );
   }
@@ -34,19 +33,19 @@ export async function DELETE(request: NextRequest, context: IRequestContext) {
   try {
     await connectDB();
     const { name } = await Promise.resolve(context.params);
-    const deletedDigimon = await Digimon.findOneAndDelete({
+    const deletedDigitama = await Digitama.findOneAndDelete({
       name: name,
     });
 
-    if (!deletedDigimon) {
-      return NextResponse.json({ error: "Digimon not found" }, { status: 404 });
+    if (!deletedDigitama) {
+      return NextResponse.json({ error: "Digitama not found" }, { status: 404 });
     }
-    revalidateTag("digimons");
-    return NextResponse.json({ message: "Digimon deleted" }, { status: 200 });
+    revalidateTag("digitamas");
+    return NextResponse.json({ message: "Digitama deleted" }, { status: 200 });
   } catch (error) {
-    console.log("Error to delete Digimon", error);
+    console.log("Error to delete Digitama", error);
     return NextResponse.json(
-      { error: "Error to delete Digimon" },
+      { error: "Error to delete Digitama" },
       { status: 500 }
     );
   }
@@ -59,22 +58,22 @@ export async function PUT(request: NextRequest, context: IRequestContext) {
   try {
     await connectDB();
     const { name } = await Promise.resolve(context.params);
-    const body: IDigimon = await request.json();
-    const updatedDigimon = await Digimon.findOneAndReplace(
+    const body: IDigitama = await request.json();
+    const updatedDigitama = await Digitama.findOneAndReplace(
       { name: name },
       body,
       { new: true }
     );
 
-    if (!updatedDigimon) {
-      return NextResponse.json({ error: "Digimon not found" }, { status: 404 });
+    if (!updatedDigitama) {
+      return NextResponse.json({ error: "Digitama not found" }, { status: 404 });
     }
     revalidateTag(name);
-    return NextResponse.json(updatedDigimon, { status: 200 });
+    return NextResponse.json(updatedDigitama, { status: 200 });
   } catch (error) {
-    console.log("Error to update Digimon", error);
+    console.log("Error to update Digitama", error);
     return NextResponse.json(
-      { error: "Error to update Digimon" },
+      { error: "Error to update Digitama" },
       { status: 500 }
     );
   }
@@ -88,21 +87,21 @@ export async function PATCH(request: NextRequest, context: IRequestContext) {
     await connectDB();
     const { name } = await Promise.resolve(context.params);
     const body = await request.json();
-    const updatedDigimon = await Digimon.findOneAndUpdate(
+    const updatedDigitama = await Digitama.findOneAndUpdate(
       { name: name },
       { $set: body },
       { new: true }
     );
 
-    if (!updatedDigimon) {
-      return NextResponse.json({ error: "Digimon not found" }, { status: 404 });
+    if (!updatedDigitama) {
+      return NextResponse.json({ error: "Digitama not found" }, { status: 404 });
     }
     revalidateTag(name);
-    return NextResponse.json(updatedDigimon, { status: 200 });
+    return NextResponse.json(updatedDigitama, { status: 200 });
   } catch (error) {
-    console.log("Error to update Digimons", error);
+    console.log("Error to update Digitamas", error);
     return NextResponse.json(
-      { error: "Error to update Digimon" },
+      { error: "Error to update Digitama" },
       { status: 500 }
     );
   }

@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/shared/lib/database";
-import Digimon, { IDigimon } from "@/domains/digimon/models/digimon.model";
+import Digitama, { IDigitama } from "@/domains/digitama/models/digitama.model";
 import { isAuthorized } from "@/shared/services/auth-middleware";
 import { revalidateTag } from "next/cache";
 
 export async function GET() {
   try {
-    await connectDB();    
-    const digimons = await Digimon.find();
-    return NextResponse.json(digimons, { status: 200 });
+    await connectDB();
+    const digitamas = await Digitama.find();
+    return NextResponse.json(digitamas, { status: 200 });
   } catch (error) {
-    console.log("Error to get Digimons", error);
+    console.log("Error to get Digitamas", error);
     return NextResponse.json(
-      { error: "Error to get Digimon" },
+      { error: "Error to get Digitama" },
       { status: 500 }
     );
   }
@@ -24,15 +24,15 @@ export async function POST(request: NextRequest) {
   }
   try {
     await connectDB();
-    const body: IDigimon = await request.json();
-    const newDigimon = new Digimon(body);
-    await newDigimon.save();
-    revalidateTag("digimons");
-    return NextResponse.json(newDigimon, { status: 201 });
+    const body: IDigitama = await request.json();
+    const newDigitama = new Digitama(body);
+    await newDigitama.save();
+    revalidateTag("digitamas");
+    return NextResponse.json(newDigitama, { status: 201 });
   } catch (error) {
-    console.log("Error to save Digimon", error);
+    console.log("Error to save Digitama", error);
     return NextResponse.json(
-      { error: "Error to save Digimon" },
+      { error: "Error to save Digitama" },
       { status: 500 }
     );
   }
