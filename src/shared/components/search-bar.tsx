@@ -70,10 +70,12 @@ export default function SearchBar(props: ISearchBarProps) {
       {filteredResults.length > 0 && (
         <ul className="absolute w-full mt-2 bg-black border border-green-500 rounded-lg shadow-lg">
           {filteredResults.map((digimon, index) => (
-            <li key={index} onClick={() => handleSelect(digimon.name)}>
+            <li key={index} onClick={() => {
+              handleSelect(digimon.name)}
+              }>
               <ResultWithIcon
                 name={digimon.name}
-                imageUrl={ImageStore[`${digimon.name}Icon`]}
+                imageUrl={ImageStore[`${digimon.name.replaceAll("-", "_")}Icon`]}
               />
             </li>
           ))}
