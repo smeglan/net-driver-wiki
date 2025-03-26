@@ -4,9 +4,12 @@ import Digimon, { IDigimon } from "@/domains/digimon/models/digimon.model";
 import { isAuthorized } from "@/shared/services/auth-middleware";
 import { revalidateTag } from "next/cache";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
-    await connectDB();    
+    await connectDB();
     const digimons = await Digimon.find();
     return NextResponse.json(digimons, { status: 200 });
   } catch (error) {

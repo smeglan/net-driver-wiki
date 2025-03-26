@@ -9,7 +9,10 @@ interface IRequestContext {
   params: Promise<{ name: string }>;
 }
 
-export async function GET(_: NextRequest, context: IRequestContext) {
+export async function GET(request: NextRequest, context: IRequestContext) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     await connectDB();
     const { name } = await Promise.resolve(context.params);

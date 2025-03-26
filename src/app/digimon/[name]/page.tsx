@@ -1,27 +1,33 @@
 import { IDigimon } from "@/domains/digimon/models/digimon.model";
-import { getAllDigimons, getDigimon } from "@/domains/digimon/services/digimon.service";
+import {
+  getAllDigimons,
+  getDigimon,
+} from "@/domains/digimon/services/digimon.service";
 import DigimonTemplate from "@/domains/digimon/template";
-import ErrorTemplate from "@/domains/error/template";
+import { redirect } from "next/navigation";
+
 
 export async function generateStaticParams() {
-  const {digimons} = await getAllDigimons();
+  const { digimons } = await getAllDigimons();
 
   return digimons.map((digimon: IDigimon) => ({
     name: digimon.name,
   }));
 }
+interface DigimonPageProps {
+  params: { name: string };
+}
 
-async function DigimonPage({ params }: { params: { name: string } }){
-  const a = await getDigimon(params.name);
-  const {status, digimon} = a
+async function DigimonPage({ params }: DigimonPageProps) {
+  const { status, digimon } = await getDigimon(params.name);
   if (!digimon) {
-    return <ErrorTemplate code={status}/>;
+    redirect(`/error/${status}`);
   }
   return (
     <div className="bg-black text-green-500 min-h-screen flex flex-col items-center p-8">
       {digimon && <DigimonTemplate digimon={digimon} />}
     </div>
   );
-};
+}
 
 export default DigimonPage;

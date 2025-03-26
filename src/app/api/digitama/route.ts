@@ -4,7 +4,10 @@ import Digitama, { IDigitama } from "@/domains/digitama/models/digitama.model";
 import { isAuthorized } from "@/shared/services/auth-middleware";
 import { revalidateTag } from "next/cache";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     await connectDB();
     const digitamas = await Digitama.find();
