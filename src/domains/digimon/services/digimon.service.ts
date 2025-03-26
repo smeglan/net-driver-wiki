@@ -1,8 +1,12 @@
 const URL = process.env.NEXT_PUBLIC_API_URL;
+const token = process.env.API_SECRET_KEY;
 
 export const getAllDigimons = async () => {
   try {
     const response = await fetch(`${URL}/api/digimon`, {
+      headers:{
+        Authorization: `Bearer ${token}`,
+      },
       next: { tags: ["digimons"] },
     });
     const data = await response.json();
@@ -26,6 +30,9 @@ export const getAllDigimons = async () => {
 export const getDigimon = async (name: string) => {
   try {
     const response = await fetch(`${URL}/api/digimon/${name}`, {
+      headers:{
+        Authorization: `Bearer ${token}`,
+      },
       next: { tags: [name] },
     });
     if (!response.ok) {

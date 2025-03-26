@@ -12,13 +12,11 @@ export default async function DigimonLayout({
     return <ErrorTemplate code={status} />;
   }
   return (
-    <html lang="en">
-      <body className="bg-black text-green-500">
-        <div className="flex flex-col items-center p-4">
-          <SearchBar digimons={digimons} />
-        </div>
-        <main>{children}</main>
-      </body>
-    </html>
+    <body className="bg-black text-green-500">
+      <div className="flex flex-col items-center p-4">
+        <SearchBar digimons={digimons} />
+      </div>
+      <main>{children}</main>
+    </body>
   );
 }

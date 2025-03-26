@@ -1,33 +1,30 @@
 import { IDigimon } from "@/domains/digimon/models/digimon.model";
-import { getAllDigimons, getDigimon } from "@/domains/digimon/services/digimon.service";
+import {
+  getAllDigimons,
+  getDigimon,
+} from "@/domains/digimon/services/digimon.service";
 import DigimonTemplate from "@/domains/digimon/template";
-import { redirect } from "next/navigation";
+import ErrorTemplate from "@/domains/error/template";
 
 export async function generateStaticParams() {
   const { digimons } = await getAllDigimons();
-  return digimons.map((digimon: IDigimon) => ({ name: digimon.name }));
+
+  return digimons.map((digimon: IDigimon) => ({
+    name: digimon.name.toLowerCase(),
+  }));
 }
 
-// ✅ Asegúrate de que `params` no sea tratado como una promesa
-interface DigimonPageProps {
-  params: { name: string };
-}
+export default async function DigimonPage({ params }: { params: Promise<{ name: string }> }) {
+  const { name } = await params;
+  const { status, digimon } = await getDigimon(name);
 
-// 🚀 No hagas `async function`, Next.js lo maneja automáticamente
-export default function DigimonPage({ params }: DigimonPageProps) {
-  const { name } = params;
+  if (!digimon) {
+    return <ErrorTemplate code={status} />;
+  }
 
-  // 👇 OBTENER DIGIMON DE FORMA SEGURA
-  return getDigimon(name).then(({ status, digimon }) => {
-    if (!digimon) {
-      redirect(`/error/${status}`);
-      return null;
-    }
-
-    return (
-      <div className="bg-black text-green-500 min-h-screen flex flex-col items-center p-8">
-        <DigimonTemplate digimon={digimon} />
-      </div>
-    );
-  });
+  return (
+    <div className="bg-black text-green-500 min-h-screen flex flex-col items-center p-8">
+      <DigimonTemplate digimon={digimon} />
+    </div>
+  );
 }
