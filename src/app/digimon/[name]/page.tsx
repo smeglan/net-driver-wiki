@@ -18,16 +18,19 @@ interface DigimonPageProps {
   params: { name: string };
 }
 
-async function DigimonPage({ params }: DigimonPageProps) {
-  const { status, digimon } = await getDigimon(params.name);
-  if (!digimon) {
-    redirect(`/error/${status}`);
-  }
-  return (
-    <div className="bg-black text-green-500 min-h-screen flex flex-col items-center p-8">
-      {digimon && <DigimonTemplate digimon={digimon} />}
-    </div>
-  );
-}
+export default function DigimonPage({ params }: DigimonPageProps) {
+  const { name } = params;
 
-export default DigimonPage;
+  // 👇 OBTENER DIGIMON DE FORMA SEGURA
+  return getDigimon(name).then(({ status, digimon }) => {
+    if (!digimon) {
+      redirect(`/error/${status}`);
+    }
+
+    return (
+      <div className="bg-black text-green-500 min-h-screen flex flex-col items-center p-8">
+        <DigimonTemplate digimon={digimon} />
+      </div>
+    );
+  });
+}
