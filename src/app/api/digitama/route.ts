@@ -10,12 +10,12 @@ export async function GET(request: NextRequest) {
   }
   try {
     await connectDB();
-    const digitamas = await Digitama.find();
+    const digitamas = await Digitama.find({}, "name title description").lean();
     return NextResponse.json(digitamas, { status: 200 });
   } catch (error) {
-    console.log("Error to get Digitamas", error);
+    console.error("Error getting Digitamas:", error);
     return NextResponse.json(
-      { error: "Error to get Digitama" },
+      { error: "Error fetching Digitama data" },
       { status: 500 }
     );
   }
