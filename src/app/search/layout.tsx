@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import SearchBarTemplate from "@/domains/search/templates/search-bar.template";
 
 export default async function DigimonLayout({
@@ -10,7 +11,7 @@ export default async function DigimonLayout({
       <div className="flex flex-col items-center p-4">
         <SearchBarTemplate />
       </div>
-      <div>{children}</div>
+      <Suspense fallback={<div>Cargando...</div>}>{children}</Suspense>
     </div>
   );
 }
