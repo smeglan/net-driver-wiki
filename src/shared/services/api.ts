@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAuthorized } from "@/shared/services/auth-middleware";
 import { connectDB } from "@/shared/lib/database";
 import { revalidateTag } from "next/cache";
+import { updateDatabase } from "../script/updateDB";
 
 export async function handleGet<T>(
   request: NextRequest,
@@ -12,9 +13,9 @@ export async function handleGet<T>(
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
   try {
     await connectDB();
+    updateDatabase();
     const data = await model.find({}, fields).lean();
     return NextResponse.json(data, { status: 200 });
   } catch (error) {

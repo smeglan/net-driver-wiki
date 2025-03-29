@@ -62,7 +62,7 @@ const ImageStore: IImageStore = {
   },
   digitama: {
     art: {
-      devices_and_dragons: "/images/digimon/art/devices-and-dragons.webp",
+      devices_and_dragons: "/images/digitama/art/devices-and-dragons.webp",
     },
     icon:{
 

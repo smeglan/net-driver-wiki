@@ -9,17 +9,13 @@ import { IItem } from "@/domains/item/models/item.model";
 import { IDigitama } from "@/domains/digitama/models/digitama.model";
 import { useRouter } from "next/navigation";
 import { Categories } from "@/shared/types/categories";
+import { SearchResult } from "@/domains/search/types/search-result";
+import { useSearch } from "@/domains/search/context/search-context";
 
 interface ISearchBarProps {
   digimons: IDigimon[] | null;
   items: IItem[] | null;
   digitamas: IDigitama[] | null;
-}
-
-interface SearchResult {
-  title: string;
-  name: string;
-  category: Categories;
 }
 
 export default function SearchBar({
@@ -28,6 +24,7 @@ export default function SearchBar({
   digitamas,
 }: ISearchBarProps) {
   const router = useRouter();
+  const { setResults } = useSearch();
   const [query, setQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState<SearchResult[]>([]);
   const [fuse, setFuse] = useState<Fuse<SearchResult> | null>(null);
@@ -46,6 +43,14 @@ export default function SearchBar({
         ...safeDigimons.map((d) => ({
           title: d.title,
           name: d.name,
+          iconURL:
+            ImageStore[Categories.Digimon]["icon"][
+              `${d.name.replaceAll("-", "_")}`
+            ] || ImageStore.digimon?.art?.default,
+          imageURL:
+            ImageStore[Categories.Digimon]["art"][
+              `${d.name.replaceAll("-", "_")}`
+            ] || ImageStore.digimon?.art?.default,
           description: d.description,
           stage: d.stage,
           attribute: d.attribute,
@@ -54,12 +59,28 @@ export default function SearchBar({
         ...safeItems.map((i) => ({
           title: i.title,
           name: i.name,
+          iconURL:
+            ImageStore[Categories.Item]["art"][
+              `${i.name.replaceAll("-", "_")}`
+            ] || ImageStore.digimon?.art?.default,
+          imageURL:
+            ImageStore[Categories.Item]["art"][
+              `${i.name.replaceAll("-", "_")}`
+            ] || ImageStore.digimon?.art?.default,
           description: i.description,
           category: Categories.Item,
         })),
         ...safeDigitamas.map((d) => ({
           title: d.title,
           name: d.name,
+          iconURL:
+            ImageStore[Categories.Digitama]["art"][
+              `${d.name.replaceAll("-", "_")}`
+            ] || ImageStore.digimon?.art?.default,
+          imageURL:
+            ImageStore[Categories.Digitama]["art"][
+              `${d.name.replaceAll("-", "_")}`
+            ] || ImageStore.digimon?.art?.default,
           description: d.description,
           category: Categories.Digitama,
         })),
@@ -82,6 +103,12 @@ export default function SearchBar({
     }
   }, [digimons, items, digitamas]);
 
+  useEffect(() => {
+    if (filteredResults.length > 0) {
+      setResults(filteredResults);
+    }
+  }, [filteredResults, setResults]);
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
@@ -101,6 +128,9 @@ export default function SearchBar({
   };
 
   const search = () => {
+    if (!query || query.trim() === "") {
+      return;
+    }
     router.push(`/search?q=${query}`);
   };
 
@@ -141,11 +171,7 @@ export default function SearchBar({
             <li key={index} onClick={() => handleSelect(result.name)}>
               <ResultWithIcon
                 name={result.title || result.name}
-                imageUrl={
-                  ImageStore[result.category]["icon"][
-                    `${result.name.replaceAll("-", "_")}`
-                  ] || ImageStore.digimon?.art?.default
-                }
+                imageUrl={result.iconURL}
                 category={result.category}
               />
             </li>

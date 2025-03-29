@@ -1,4 +1,4 @@
-import SearchBarTemplate from "@/domains/search/templates/search";
+import SearchBarTemplate from "@/domains/search/templates/search-bar.template";
 
 export default async function Home() {
   return (

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SearchProvider } from "@/domains/search/context/search-context";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,7 +15,9 @@ export default async function RootLayout({
   return (
     <html lang="es">
       <body className="bg-black text-green-500">
-        <main>{children}</main>
+        <main>
+          <SearchProvider>{children}</SearchProvider>
+        </main>
       </body>
     </html>
   );
