@@ -20,6 +20,8 @@ const ImageStore: IImageStore = {
     art: {
       default: "/images/digimon/art/default.webp",
       agumon: "/images/digimon/art/agumon.webp",
+      agumon_black: "/images/digimon/art/agumon-black.webp",
+      yuki_agumon: "/images/digimon/art/yuki-agumon.webp",
       kokuwamon: "/images/digimon/art/kokuwamon.webp",
       greymon: "/images/digimon/art/greymon.webp",
       tyranomon: "/images/digimon/art/tyranomon.webp",

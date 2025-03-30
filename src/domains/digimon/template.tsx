@@ -11,6 +11,7 @@ interface IDigimonTemplateProps {
 }
 
 export default function DigimonTemplate({ digimon }: IDigimonTemplateProps) {
+  console.log(digimon)
   return (
     <div className="flex flex-col bg-black text-green-400 p-6 font-mono border border-green-600 rounded-lg shadow-lg">
       <div className="flex flex-col md:flex-row bg-black text-green-400 p-6 font-mono">
