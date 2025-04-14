@@ -2,8 +2,12 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 import { SearchResult } from "@/domains/search/types/search-result";
+import Fuse from "fuse.js";
+import { useSearchParams } from "next/navigation";
 
 interface SearchContextProps {
+  fuse: Fuse<SearchResult> | null;
+  setFuse: (fuse: Fuse<SearchResult> | null) => void;
   query: string;
   setQuery: (query: string) => void;
   results: SearchResult[];
@@ -13,11 +17,16 @@ interface SearchContextProps {
 const SearchContext = createContext<SearchContextProps | undefined>(undefined);
 
 export function SearchProvider({ children }: { children: ReactNode }) {
-  const [query, setQuery] = useState<string>("");
+  const searchParams = useSearchParams();
+  const queryParam = searchParams.get("q") || "";
+  const [fuse, setFuse] = useState<Fuse<SearchResult> | null>(null);
+  const [query, setQuery] = useState<string>(queryParam);
   const [results, setResults] = useState<SearchResult[]>([]);
 
   return (
-    <SearchContext.Provider value={{ query, setQuery, results, setResults }}>
+    <SearchContext.Provider
+      value={{ fuse, setFuse, query, setQuery, results, setResults }}
+    >
       {children}
     </SearchContext.Provider>
   );

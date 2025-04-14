@@ -10,7 +10,7 @@ export default async function DigimonLayout({
       <div className="flex flex-col items-center p-4">
         <SearchBarTemplate/>
       </div>
-      <main>{children}</main>
+      <div>{children}</div>
     </body>
   );
 }

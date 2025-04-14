@@ -13,5 +13,14 @@ export default async function SearchBarTemplate() {
   if (!digimons && !items && !digitamas) {
     return <ErrorTemplate code={status} />;
   }
-  return <SearchBar digimons={digimons} digitamas={digitamas} items={items} />;
+  const safeDigimons = digimons ?? [];
+  const safeItems = items ?? [];
+  const safeDigitamas = digitamas ?? [];
+  return (
+    <SearchBar
+      digimons={safeDigimons}
+      items={safeItems}
+      digitamas={safeDigitamas}
+    />
+  );
 }

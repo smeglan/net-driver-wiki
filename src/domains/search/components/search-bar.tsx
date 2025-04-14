@@ -1,20 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
-import Fuse from "fuse.js";
+
 import { ArrowRightIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import ResultWithIcon from "@/shared/components/result-with-icon";
-import { IDigimon } from "@/domains/digimon/models/digimon.model";
-import { IItem } from "@/domains/item/models/item.model";
-import { IDigitama } from "@/domains/digitama/models/digitama.model";
 import { useRouter } from "next/navigation";
-import { SearchResult } from "@/domains/search/types/search-result";
 import { useSearch } from "@/domains/search/context/search-context";
-import { GetQuery } from "@/domains/search/services/get-query";
+import { useEffect, useMemo, useState } from "react";
+import { getQuery } from "@/domains/search/services/get-query";
+import { IDigimon } from "@/domains/digimon/models/digimon.model";
+import { IDigitama } from "@/domains/digitama/models/digitama.model";
+import { IItem } from "@/domains/item/models/item.model";
 
 interface ISearchBarProps {
-  digimons: IDigimon[] | null;
-  items: IItem[] | null;
-  digitamas: IDigitama[] | null;
+  digimons: IDigimon[];
+  items: IItem[];
+  digitamas: IDigitama[];
 }
 
 export default function SearchBar({
@@ -23,24 +22,28 @@ export default function SearchBar({
   digitamas,
 }: ISearchBarProps) {
   const router = useRouter();
-  const { results, setResults } = useSearch();
-  const { query, setQuery } = useSearch();
-  const [fuse, setFuse] = useState<Fuse<SearchResult> | null>(null);
+  const [showList, setShowList] = useState(false);
+  const { fuse, setFuse, query, setQuery, results, setResults } = useSearch();
 
-  useEffect(() => {
-    const safeDigimons = digimons ?? [];
-    const safeItems = items ?? [];
-    const safeDigitamas = digitamas ?? [];
-    const newFuse = GetQuery(safeDigimons, safeItems, safeDigitamas);
-    if (newFuse) {
-      setFuse(newFuse);
-    }
+  const newFuse = useMemo(() => {
+    return getQuery(digimons, items, digitamas);
   }, [digimons, items, digitamas]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  useEffect(() => {
+    if (newFuse) setFuse(newFuse);
+  }, [newFuse, setFuse]);
+
+  useEffect(() => {
+    if (fuse && query.trim() !== "") {
+      search(query);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fuse]);
+
+  const search = (value: string) => {
     setQuery(value);
     if (!fuse || value.trim() === "") {
+      setShowList(false);
       setResults([]);
       return;
     }
@@ -48,15 +51,22 @@ export default function SearchBar({
     setResults(newResults);
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setShowList(true);
+    search(value);
+  };
+
   const handleSelect = (name: string) => {
     setQuery(name);
-    setResults([]);
+    setShowList(false);
   };
 
   const executeSearch = () => {
     if (!query.trim()) return;
     router.push(`/search?q=${query}`);
   };
+
   return (
     <div className="relative w-72">
       <input
@@ -79,6 +89,7 @@ export default function SearchBar({
           <XMarkIcon className="w-5 h-5 text-green-500 font-bold hover:text-white" />
         </button>
       )}
+
       <button
         className="absolute inset-y-0 right-3 flex items-center"
         onClick={executeSearch}
@@ -86,11 +97,8 @@ export default function SearchBar({
         <ArrowRightIcon className="w-7 h-7 text-green-500 font-bold hover:text-green-400" />
       </button>
 
-      {results.length > 0 && (
-        <ul
-          className="absolute w-full mt-2 bg-black border border-green-500 rounded-lg shadow-lg 
-               max-h-80 overflow-y-auto styles"
-        >
+      {showList && results.length > 0 && (
+        <ul className="absolute w-full mt-2 bg-black border border-green-500 rounded-lg shadow-lg max-h-80 overflow-y-auto styles">
           {results.map((result, index) => (
             <li key={index} onClick={() => handleSelect(result.name)}>
               <ResultWithIcon

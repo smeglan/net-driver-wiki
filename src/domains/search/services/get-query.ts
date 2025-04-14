@@ -6,7 +6,7 @@ import ImageStore from "@/shared/lib/image-store";
 import { SearchResult } from "@/domains/search/types/search-result";
 import Fuse from "fuse.js";
 
-export const GetQuery = (
+export const getQuery = (
   digimons: IDigimon[],
   items: IItem[],
   digitamas: IDigitama[]
